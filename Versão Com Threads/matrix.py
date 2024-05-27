@@ -1,50 +1,50 @@
 import numpy as np
 import threading
 
-class Matrix:
-    def __init__(self, lines, cols):
-        self.lines = lines
-        self.cols = cols
-        self.matrix = np.zeros((lines, cols), dtype=int)
+class Matriz:
+    def __init__(self, linhas, colunas):
+        self.linhas = linhas
+        self.colunas = colunas
+        self.matriz = np.zeros((linhas, colunas), dtype=int)
 
-    def fill(self):
-        self.matrix = np.random.randint(-9, 10, size=(self.lines, self.cols))
+    def preencher(self):
+        self.matriz = np.random.randint(-9, 10, size=(self.linhas, self.colunas))
 
     def __str__(self):
-        return str(self.matrix)
+        return str(self.matriz)
 
 
-def multiply_matrices(m1, m2):
-    if m1.cols != m2.lines:
-        raise ValueError("Incompatible dimensions")
+def multiplicar_matrizes(m1, m2):
+    if m1.colunas != m2.linhas:
+        raise ValueError("Dimensões incompatíveis")
     
-    res = Matrix(m1.lines, m2.cols)
+    res = Matriz(m1.linhas, m2.colunas)
     
-    for i in range(res.lines):
-        for j in range(res.cols):
-            res.matrix[i][j] = np.dot(m1.matrix[i, :], m2.matrix[:, j])
+    for i in range(res.linhas):
+        for j in range(res.colunas):
+            res.matriz[i][j] = np.dot(m1.matriz[i, :], m2.matriz[:, j])
     
     return res
 
 
-def multiply_t_matrices(m1, m2):
-    if m1.cols != m2.lines:
-        raise ValueError("Incompatible dimensions")
+def multiplicar_t_matrizes(m1, m2):
+    if m1.colunas != m2.linhas:
+        raise ValueError("Dimensões incompatíveis")
     
-    res = Matrix(m1.lines, m2.cols)
+    res = Matriz(m1.linhas, m2.colunas)
     threads = []
     num_threads = 12  # Ajustado para 12 threads
-    chunk_size = res.lines // num_threads
+    tamanho_bloco = res.linhas // num_threads
     
-    def worker(start, end):
-        for i in range(start, end):
-            for j in range(res.cols):
-                res.matrix[i][j] = np.dot(m1.matrix[i, :], m2.matrix[:, j])
+    def worker(inicio, fim):
+        for i in range(inicio, fim):
+            for j in range(res.colunas):
+                res.matriz[i][j] = np.dot(m1.matriz[i, :], m2.matriz[:, j])
     
     for i in range(num_threads):  # Use a variável num_threads aqui
-        start = i * chunk_size
-        end = (i + 1) * chunk_size if i != (num_threads - 1) else res.lines
-        thread = threading.Thread(target=worker, args=(start, end))
+        inicio = i * tamanho_bloco
+        fim = (i + 1) * tamanho_bloco if i != (num_threads - 1) else res.linhas
+        thread = threading.Thread(target=worker, args=(inicio, fim))
         threads.append(thread)
         thread.start()
     
@@ -54,6 +54,6 @@ def multiply_t_matrices(m1, m2):
     return res
 
 
-def free_matrices(*matrices):
-    for m in matrices:
+def liberar_matrizes(*matrizes):
+    for m in matrizes:
         del m
