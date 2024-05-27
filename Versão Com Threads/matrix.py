@@ -33,16 +33,17 @@ def multiply_t_matrices(m1, m2):
     
     res = Matrix(m1.lines, m2.cols)
     threads = []
-    chunk_size = res.lines // 8
+    num_threads = 12  # Ajustado para 12 threads
+    chunk_size = res.lines // num_threads
     
     def worker(start, end):
         for i in range(start, end):
             for j in range(res.cols):
                 res.matrix[i][j] = np.dot(m1.matrix[i, :], m2.matrix[:, j])
     
-    for i in range(8): # aqui no valor () mexe no valor do thereads
+    for i in range(num_threads):  # Use a variável num_threads aqui
         start = i * chunk_size
-        end = (i + 1) * chunk_size if i != 7 else res.lines
+        end = (i + 1) * chunk_size if i != (num_threads - 1) else res.lines
         thread = threading.Thread(target=worker, args=(start, end))
         threads.append(thread)
         thread.start()
@@ -56,4 +57,3 @@ def multiply_t_matrices(m1, m2):
 def free_matrices(*matrices):
     for m in matrices:
         del m
-
